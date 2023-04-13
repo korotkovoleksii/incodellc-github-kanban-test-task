@@ -1,12 +1,17 @@
-import './App.css'
+import { Box, Container } from '@mui/material';
+import './App.css';
+import SearchFormUrl from '../../modules/components/SearchFormUrl/SearchFormUrl';
 
 function App() {
-
   return (
-    <div className="App">
-      Start
-    </div>
-  )
+    <Box>
+      <Container>
+        <Box>
+          <SearchFormUrl />
+        </Box>
+      </Container>
+    </Box>
+  );
 }
 
-export default App
+export default App;
