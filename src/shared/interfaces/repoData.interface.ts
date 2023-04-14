@@ -1,6 +1,6 @@
 export interface IRepoData {
   fullName: string;
-  starGazersCount: number;
+  stargazersCount: number;
   todoState: IIssuesItem[];
   progressState: IIssuesItem[];
   doneState: IIssuesItem[];
@@ -12,4 +12,6 @@ export interface IIssuesItem {
   createdAt: string;
   typeUser: string;
   comments: number;
+  state: string;
+  assignee: boolean;
 }

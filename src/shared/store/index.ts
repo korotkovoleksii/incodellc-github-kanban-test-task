@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from '@reduxjs/toolkit';
-import repoDataReducer from './ReroData/repoDataSlice';
+import repoDataReducer from './RepoData/repoDataSlice';
 
 export const store = configureStore({
   reducer: repoDataReducer,

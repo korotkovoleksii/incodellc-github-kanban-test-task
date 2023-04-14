@@ -1,9 +1,27 @@
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { useState } from 'react';
+import {
+  useAppDispatch,
+  useAppSelector,
+} from '../../../shared/hooks/redux-hooks';
+import {
+  retrieveDataRepo,
+  retrieveIssuesRepo,
+} from '../../../shared/store/RepoData/repoDataSlice';
 
 const SearchFormUrl = (): JSX.Element => {
   const [url, setUrl] = useState('');
+  const dispatch = useAppDispatch();
+  const data = useAppSelector((state) => state);
+
+  const handlerLoadIssues = () => {
+    console.log('fsd');
+    const fullNameRepo = url.split('/').slice(-2).join('/');
+
+    dispatch(retrieveDataRepo(fullNameRepo));
+    dispatch(retrieveIssuesRepo(fullNameRepo));
+  };
   return (
     <Box
       sx={{ display: 'flex', flexDirection: 'column', mt: '15px', mb: '15px' }}
@@ -27,17 +45,24 @@ const SearchFormUrl = (): JSX.Element => {
             setUrl(e.target.value);
           }}
         />
-        <Button variant="contained" sx={{ width: 155 }} size="small">
+        <Button
+          variant="contained"
+          sx={{ width: 155 }}
+          size="small"
+          onClick={handlerLoadIssues}
+        >
           Load issues
         </Button>
       </Box>
-      <Stack direction="row" spacing={2}>
-        <Typography sx={{ color: '#4259CB' }}>FaceBook {'>'} React</Typography>
-        <Stack direction="row">
-          <StarIcon sx={{ color: '#E67700' }} />
-          <Typography> 154K starts</Typography>
+      {data.fullName !== '' && (
+        <Stack direction="row" spacing={2}>
+          <Typography sx={{ color: '#4259CB' }}>{data.fullName}</Typography>
+          <Stack direction="row">
+            <StarIcon sx={{ color: '#E67700' }} />
+            <Typography> {data.stargazersCount} starts</Typography>
+          </Stack>
         </Stack>
-      </Stack>
+      )}
     </Box>
   );
 };
