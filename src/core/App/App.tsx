@@ -1,6 +1,7 @@
 import { Box, Container } from '@mui/material';
 import './App.css';
 import SearchFormUrl from '../../modules/components/SearchFormUrl/SearchFormUrl';
+import CardBoard from '../../modules/components/CardBoard/CardBoard';
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <Container>
         <Box>
           <SearchFormUrl />
+          <CardBoard />
         </Box>
       </Container>
     </Box>
