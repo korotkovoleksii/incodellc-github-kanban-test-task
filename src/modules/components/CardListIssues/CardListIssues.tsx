@@ -70,6 +70,7 @@ const CardListIssues = ({
                   </Draggable>
                 );
               })}
+              {provider.placeholder}
             </Box>
           )}
         </Droppable>

@@ -9,7 +9,7 @@ const initialState: IRepoData = {
   stargazersCount: 0,
   todoState: { taskList: [], title: 'ToDo' },
   progressState: { taskList: [], title: 'In Progress' },
-  doneState: { taskList: [], title: 'ToDo' },
+  doneState: { taskList: [], title: 'Done' },
 };
 
 export const retrieveDataRepo = createAsyncThunk(
