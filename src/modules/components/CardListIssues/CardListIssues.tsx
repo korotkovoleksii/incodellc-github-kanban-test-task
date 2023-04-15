@@ -1,6 +1,7 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { IIssuesItem } from '../../../shared/interfaces/repoData.interface';
 import CardIssues from '../CardIssues/CardIssues';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 const CardListIssues = ({
   todoState,
@@ -11,9 +12,14 @@ const CardListIssues = ({
 }): JSX.Element => {
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
     >
       {titleList}
+
       <Box
         sx={{
           width: 250,
@@ -32,18 +38,41 @@ const CardListIssues = ({
           scrollbarWidth: 'none',
         }}
       >
-        <Box
-          sx={{
-            width: 215,
-            gap: '10px',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {todoState.map((item) => (
-            <CardIssues {...item} key={item.number} />
-          ))}
-        </Box>
+        <Droppable droppableId={titleList}>
+          {(provider) => (
+            <Box
+              {...provider.droppableProps}
+              ref={provider.innerRef}
+              sx={{
+                width: 215,
+                gap: '10px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {todoState.map((item, index) => {
+                return (
+                  <Draggable
+                    key={item.number}
+                    draggableId={item.number.toString()}
+                    index={index}
+                  >
+                    {(provider) => (
+                      <Box
+                        key={item.number}
+                        ref={provider.innerRef}
+                        {...provider.draggableProps}
+                        {...provider.dragHandleProps}
+                      >
+                        <CardIssues {...item} />
+                      </Box>
+                    )}
+                  </Draggable>
+                );
+              })}
+            </Box>
+          )}
+        </Droppable>
       </Box>
     </Box>
   );
