@@ -20,16 +20,16 @@ const CardBoard = (): JSX.Element => {
         >
           <DragDropContext onDragEnd={handleDragEnd}>
             <CardListIssues
-              todoState={issuesLists.todoState}
-              titleList="ToDo"
+              todoState={issuesLists.todoState.taskList}
+              titleList={issuesLists.todoState.title}
             />
             <CardListIssues
-              todoState={issuesLists.progressState}
-              titleList="In Progress"
+              todoState={issuesLists.progressState.taskList}
+              titleList={issuesLists.progressState.title}
             />
             <CardListIssues
-              todoState={issuesLists.doneState}
-              titleList="Done"
+              todoState={issuesLists.doneState.taskList}
+              titleList={issuesLists.doneState.title}
             />
           </DragDropContext>
         </Box>

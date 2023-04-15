@@ -7,9 +7,9 @@ import { IResponseIssues } from '../../interfaces/responseIssues.interface';
 const initialState: IRepoData = {
   fullName: '',
   stargazersCount: 0,
-  todoState: [],
-  progressState: [],
-  doneState: [],
+  todoState: { taskList: [], title: 'ToDo' },
+  progressState: { taskList: [], title: 'In Progress' },
+  doneState: { taskList: [], title: 'ToDo' },
 };
 
 export const retrieveDataRepo = createAsyncThunk(
@@ -90,7 +90,15 @@ const repoDataSlice = createSlice({
     });
     builder.addCase(retrieveIssuesRepo.fulfilled, (state, action) => {
       if (action.payload) {
-        return { ...state, ...action.payload };
+        return {
+          ...state,
+          todoState: { ...state.todoState, taskList: action.payload.todoState },
+          progressState: {
+            ...state.progressState,
+            taskList: action.payload.progressState,
+          },
+          doneState: { ...state.doneState, taskList: action.payload.doneState },
+        };
       }
     });
   },

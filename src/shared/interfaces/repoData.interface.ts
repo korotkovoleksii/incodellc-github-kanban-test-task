@@ -1,9 +1,14 @@
 export interface IRepoData {
   fullName: string;
   stargazersCount: number;
-  todoState: IIssuesItem[];
-  progressState: IIssuesItem[];
-  doneState: IIssuesItem[];
+  todoState: IIssuesListTask;
+  progressState: IIssuesListTask;
+  doneState: IIssuesListTask;
+}
+
+interface IIssuesListTask {
+  taskList: IIssuesItem[];
+  title: string;
 }
 
 export interface IIssuesItem {
