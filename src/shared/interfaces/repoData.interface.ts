@@ -20,3 +20,7 @@ export interface IIssuesItem {
   state: string;
   assignee: boolean;
 }
+export interface IRootState {
+  currentRepoTitle: string;
+  arrRepoData: IRepoData[];
+}

@@ -3,26 +3,26 @@ import {
   IIssuesItem,
   IRepoData,
   IIssuesListTask,
+  IRootState,
 } from '../../interfaces/repoData.interface';
 import { Endpoints } from '../../enums/Endpoints';
 import { convertKeys } from '../../helpers/convertKey';
 import { IResponseIssues } from '../../interfaces/responseIssues.interface';
 import { DraggableLocation } from 'react-beautiful-dnd';
 
-const initialState: IRepoData = {
-  fullName: '',
-  stargazersCount: 0,
-  todoState: { taskList: [], title: 'ToDo' },
-  progressState: { taskList: [], title: 'In Progress' },
-  doneState: { taskList: [], title: 'Done' },
+const initialState: IRootState = {
+  currentRepoTitle: '',
+  arrRepoData: [],
 };
 
 export const retrieveDataRepo = createAsyncThunk(
   'repo/retrieveDataRepo',
-  async (fullNameRepo: string, {}) => {
-    console.log(fullNameRepo, 'retrieveDataRepo');
+  async (_, { getState }) => {
+    const state = getState() as IRootState;
+
+    console.log(state.currentRepoTitle, 'retrieveDataRepo');
     try {
-      const res = await fetch(`${Endpoints.API_URL}${fullNameRepo}`);
+      const res = await fetch(`${Endpoints.API_URL}${state.currentRepoTitle}`);
 
       if (res.ok) {
         const data = await res.json();
@@ -41,10 +41,14 @@ export const retrieveDataRepo = createAsyncThunk(
 
 export const retrieveIssuesRepo = createAsyncThunk(
   'repo/retrieveIssuesRepo',
-  async (fullNameRepo: string, {}) => {
-    console.log(fullNameRepo, 'retrieveDataRepo');
+  async (_, { getState }) => {
+    const state = getState() as IRootState;
+
+    console.log(state.currentRepoTitle, 'retrieveDataRepo');
     try {
-      const res = await fetch(`${Endpoints.API_URL}${fullNameRepo}/issues`);
+      const res = await fetch(
+        `${Endpoints.API_URL}${state.currentRepoTitle}/issues`
+      );
 
       if (res.ok) {
         const data = await res.json();
@@ -93,54 +97,74 @@ const repoDataSlice = createSlice({
         destination: DraggableLocation;
       }>
     ) {
-      const sourceRow = Object.values(state).find(
-        (item): item is IIssuesListTask =>
-          (item as IIssuesListTask).title === action.payload.source.droppableId
+      const currentBoard = state.arrRepoData.find(
+        (item) => item.fullName === state.currentRepoTitle
       );
-
-      const destinationRow = Object.values(state).find(
-        (item): item is IIssuesListTask =>
-          (item as IIssuesListTask).title ===
-          action.payload.destination.droppableId
-      );
-
-      if (sourceRow && destinationRow) {
-        const selectedCard = sourceRow.taskList[action.payload.source.index];
-        const arrWithoutCard = sourceRow.taskList.filter(
-          (item, index) => index !== action.payload.source.index
+      if (currentBoard) {
+        const sourceRow = Object.values(currentBoard).find(
+          (item): item is IIssuesListTask =>
+            (item as IIssuesListTask).title ===
+            action.payload.source.droppableId
         );
-        sourceRow.taskList = arrWithoutCard;
-        destinationRow.taskList.splice(
-          action.payload.destination.index,
-          0,
-          selectedCard
+
+        const destinationRow = Object.values(currentBoard).find(
+          (item): item is IIssuesListTask =>
+            (item as IIssuesListTask).title ===
+            action.payload.destination.droppableId
         );
+
+        if (sourceRow && destinationRow) {
+          const selectedCard = sourceRow.taskList[action.payload.source.index];
+          const arrWithoutCard = sourceRow.taskList.filter(
+            (item, index) => index !== action.payload.source.index
+          );
+          sourceRow.taskList = arrWithoutCard;
+          destinationRow.taskList.splice(
+            action.payload.destination.index,
+            0,
+            selectedCard
+          );
+        }
       }
+    },
+    setCurrentTitle(state, action: PayloadAction<{ currentTitle: string }>) {
+      state.currentRepoTitle = action.payload.currentTitle;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(retrieveDataRepo.fulfilled, (state, action) => {
       if (action.payload) {
-        state.fullName = action.payload.fullName;
-        state.stargazersCount = action.payload.stargazersCount;
+        const rez = state.arrRepoData.findIndex(
+          (item) => item.fullName === state.currentRepoTitle
+        );
+        if (rez === -1) {
+          const newRepo = {
+            fullName: state.currentRepoTitle,
+            stargazersCount: action.payload.stargazersCount,
+            todoState: { taskList: [], title: 'ToDo' },
+            progressState: { taskList: [], title: 'In Progress' },
+            doneState: { taskList: [], title: 'Done' },
+          };
+
+          state.arrRepoData.push(newRepo);
+        }
       }
     });
     builder.addCase(retrieveIssuesRepo.fulfilled, (state, action) => {
       if (action.payload) {
-        return {
-          ...state,
-          todoState: { ...state.todoState, taskList: action.payload.todoState },
-          progressState: {
-            ...state.progressState,
-            taskList: action.payload.progressState,
-          },
-          doneState: { ...state.doneState, taskList: action.payload.doneState },
-        };
+        const rez = state.arrRepoData.find(
+          (item) => item.fullName === state.currentRepoTitle
+        );
+        if (rez) {
+          rez.doneState.taskList = action.payload.doneState;
+          rez.progressState.taskList = action.payload.progressState;
+          rez.todoState.taskList = action.payload.todoState;
+        }
       }
     });
   },
 });
 
-export const { moveCard } = repoDataSlice.actions;
+export const { moveCard, setCurrentTitle } = repoDataSlice.actions;
 
 export default repoDataSlice.reducer;

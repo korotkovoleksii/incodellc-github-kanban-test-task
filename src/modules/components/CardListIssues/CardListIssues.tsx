@@ -19,30 +19,29 @@ const CardListIssues = ({
       }}
     >
       {titleList}
-
-      <Box
-        sx={{
-          width: 250,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          bgcolor: '#CED4DA',
-          pt: '15px',
-          pb: '15px',
-          minHeight: 600,
-          maxHeight: 600,
-          overflow: 'hidden',
-          overflowY: 'scroll',
-          '&::-webkit-scrollbar': { display: 'none' },
-          msOverflowStyle: 'none',
-          scrollbarWidth: 'none',
-        }}
-      >
-        <Droppable droppableId={titleList}>
-          {(provider) => (
+      <Droppable droppableId={titleList}>
+        {(provider) => (
+          <Box
+            {...provider.droppableProps}
+            ref={provider.innerRef}
+            sx={{
+              width: 250,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              bgcolor: '#CED4DA',
+              pt: '15px',
+              pb: '15px',
+              minHeight: 600,
+              maxHeight: 600,
+              overflow: 'hidden',
+              overflowY: 'scroll',
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
+            }}
+          >
             <Box
-              {...provider.droppableProps}
-              ref={provider.innerRef}
               sx={{
                 width: 215,
                 gap: '10px',
@@ -72,9 +71,9 @@ const CardListIssues = ({
               })}
               {provider.placeholder}
             </Box>
-          )}
-        </Droppable>
-      </Box>
+          </Box>
+        )}
+      </Droppable>
     </Box>
   );
 };

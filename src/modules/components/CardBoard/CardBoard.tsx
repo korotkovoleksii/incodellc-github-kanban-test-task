@@ -6,8 +6,11 @@ import {
 import CardListIssues from '../CardListIssues/CardListIssues';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { moveCard } from '../../../shared/store/RepoData/repoDataSlice';
+
 const CardBoard = (): JSX.Element => {
-  const issuesLists = useAppSelector((state) => state);
+  const issuesLists = useAppSelector((state) =>
+    state.arrRepoData.find((item) => item.fullName === state.currentRepoTitle)
+  );
   const dispatch = useAppDispatch();
 
   const handleDragEnd = (result: DropResult) => {
@@ -16,9 +19,10 @@ const CardBoard = (): JSX.Element => {
       dispatch(moveCard({ destination, source }));
     }
   };
+
   return (
     <>
-      {issuesLists.fullName !== '' && (
+      {issuesLists && issuesLists.fullName !== '' && (
         <Box
           sx={{
             display: 'flex',
@@ -45,4 +49,5 @@ const CardBoard = (): JSX.Element => {
     </>
   );
 };
+
 export default CardBoard;

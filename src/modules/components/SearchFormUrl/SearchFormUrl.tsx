@@ -8,20 +8,27 @@ import {
 import {
   retrieveDataRepo,
   retrieveIssuesRepo,
+  setCurrentTitle,
 } from '../../../shared/store/RepoData/repoDataSlice';
 
 const SearchFormUrl = (): JSX.Element => {
   const [url, setUrl] = useState('');
   const dispatch = useAppDispatch();
-  const data = useAppSelector((state) => state);
+  const data = useAppSelector((state) =>
+    state.arrRepoData.find((item) => item.fullName === state.currentRepoTitle)
+  );
+
+  const currentTitle = useAppSelector((state) => state.currentRepoTitle);
 
   const handlerLoadIssues = () => {
-    console.log('fsd');
     const fullNameRepo = url.split('/').slice(-2).join('/');
-
-    dispatch(retrieveDataRepo(fullNameRepo));
-    dispatch(retrieveIssuesRepo(fullNameRepo));
+    dispatch(setCurrentTitle({ currentTitle: fullNameRepo }));
+    if (currentTitle !== '') {
+      dispatch(retrieveDataRepo());
+      dispatch(retrieveIssuesRepo());
+    }
   };
+
   return (
     <Box
       sx={{ display: 'flex', flexDirection: 'column', mt: '15px', mb: '15px' }}
@@ -54,7 +61,7 @@ const SearchFormUrl = (): JSX.Element => {
           Load issues
         </Button>
       </Box>
-      {data.fullName !== '' && (
+      {data && data.fullName !== '' && (
         <Stack direction="row" spacing={2}>
           <Typography sx={{ color: '#4259CB' }}>{data.fullName}</Typography>
           <Stack direction="row">
