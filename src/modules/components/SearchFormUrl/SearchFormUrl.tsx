@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { useState } from 'react';
 import {
@@ -63,7 +63,9 @@ const SearchFormUrl = (): JSX.Element => {
       </Box>
       {data && data.fullName !== '' && (
         <Stack direction="row" spacing={2}>
-          <Typography sx={{ color: '#4259CB' }}>{data.fullName}</Typography>
+          <Link href={url} underline="none" target="_blank">
+            <Typography sx={{ color: '#4259CB' }}>{data.fullName}</Typography>
+          </Link>
           <Stack direction="row">
             <StarIcon sx={{ color: '#E67700' }} />
             <Typography> {data.stargazersCount} starts</Typography>
