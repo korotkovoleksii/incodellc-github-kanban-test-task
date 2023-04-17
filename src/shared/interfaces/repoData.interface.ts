@@ -6,7 +6,7 @@ export interface IRepoData {
   doneState: IIssuesListTask;
 }
 
-interface IIssuesListTask {
+export interface IIssuesListTask {
   taskList: IIssuesItem[];
   title: string;
 }

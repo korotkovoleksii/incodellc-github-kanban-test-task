@@ -1,8 +1,13 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { IIssuesItem, IRepoData } from '../../interfaces/repoData.interface';
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+  IIssuesItem,
+  IRepoData,
+  IIssuesListTask,
+} from '../../interfaces/repoData.interface';
 import { Endpoints } from '../../enums/Endpoints';
 import { convertKeys } from '../../helpers/convertKey';
 import { IResponseIssues } from '../../interfaces/responseIssues.interface';
+import { DraggableLocation } from 'react-beautiful-dnd';
 
 const initialState: IRepoData = {
   fullName: '',
@@ -80,7 +85,39 @@ export const retrieveIssuesRepo = createAsyncThunk(
 const repoDataSlice = createSlice({
   name: '@@repo',
   initialState,
-  reducers: {},
+  reducers: {
+    moveCard(
+      state,
+      action: PayloadAction<{
+        source: DraggableLocation;
+        destination: DraggableLocation;
+      }>
+    ) {
+      const sourceRow = Object.values(state).find(
+        (item): item is IIssuesListTask =>
+          (item as IIssuesListTask).title === action.payload.source.droppableId
+      );
+
+      const destinationRow = Object.values(state).find(
+        (item): item is IIssuesListTask =>
+          (item as IIssuesListTask).title ===
+          action.payload.destination.droppableId
+      );
+
+      if (sourceRow && destinationRow) {
+        const selectedCard = sourceRow.taskList[action.payload.source.index];
+        const arrWithoutCard = sourceRow.taskList.filter(
+          (item, index) => index !== action.payload.source.index
+        );
+        sourceRow.taskList = arrWithoutCard;
+        destinationRow.taskList.splice(
+          action.payload.destination.index,
+          0,
+          selectedCard
+        );
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(retrieveDataRepo.fulfilled, (state, action) => {
       if (action.payload) {
@@ -103,5 +140,7 @@ const repoDataSlice = createSlice({
     });
   },
 });
+
+export const { moveCard } = repoDataSlice.actions;
 
 export default repoDataSlice.reducer;

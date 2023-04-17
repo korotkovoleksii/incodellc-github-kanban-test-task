@@ -1,12 +1,20 @@
 import { Box } from '@mui/material';
-import { useAppSelector } from '../../../shared/hooks/redux-hooks';
+import {
+  useAppDispatch,
+  useAppSelector,
+} from '../../../shared/hooks/redux-hooks';
 import CardListIssues from '../CardListIssues/CardListIssues';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { moveCard } from '../../../shared/store/RepoData/repoDataSlice';
 const CardBoard = (): JSX.Element => {
   const issuesLists = useAppSelector((state) => state);
+  const dispatch = useAppDispatch();
 
-  const handleDragEnd = (result) => {
-    console.log(result);
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source } = result;
+    if (destination && source) {
+      dispatch(moveCard({ destination, source }));
+    }
   };
   return (
     <>
