@@ -1,6 +1,6 @@
 import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useAppDispatch,
   useAppSelector,
@@ -14,19 +14,22 @@ import {
 const SearchFormUrl = (): JSX.Element => {
   const [url, setUrl] = useState('');
   const dispatch = useAppDispatch();
+  const currentTitle = useAppSelector((state) => state.currentRepoTitle);
+
   const data = useAppSelector((state) =>
-    state.arrRepoData.find((item) => item.fullName === state.currentRepoTitle)
+    state.arrRepoData.find((item) => item.fullName === currentTitle)
   );
 
-  const currentTitle = useAppSelector((state) => state.currentRepoTitle);
+  useEffect(() => {
+    if (data === undefined && currentTitle !== '') {
+      dispatch(retrieveDataRepo());
+      dispatch(retrieveIssuesRepo());
+    }
+  }, [currentTitle]);
 
   const handlerLoadIssues = () => {
     const fullNameRepo = url.split('/').slice(-2).join('/');
     dispatch(setCurrentTitle({ currentTitle: fullNameRepo }));
-    if (currentTitle !== '') {
-      dispatch(retrieveDataRepo());
-      dispatch(retrieveIssuesRepo());
-    }
   };
 
   return (

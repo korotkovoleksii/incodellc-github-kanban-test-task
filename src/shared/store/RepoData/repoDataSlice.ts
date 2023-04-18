@@ -20,7 +20,6 @@ export const retrieveDataRepo = createAsyncThunk(
   async (_, { getState }) => {
     const state = getState() as IRootState;
 
-    console.log(state.currentRepoTitle, 'retrieveDataRepo');
     try {
       const res = await fetch(`${Endpoints.API_URL}${state.currentRepoTitle}`);
 
@@ -44,7 +43,6 @@ export const retrieveIssuesRepo = createAsyncThunk(
   async (_, { getState }) => {
     const state = getState() as IRootState;
 
-    console.log(state.currentRepoTitle, 'retrieveDataRepo');
     try {
       const res = await fetch(
         `${Endpoints.API_URL}${state.currentRepoTitle}/issues`
