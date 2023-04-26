@@ -1,6 +1,21 @@
-import { describe, it, expect } from 'vitest';
-import reducer, { moveCard, setCurrentTitle } from './repoDataSlice';
+import { describe, it, expect, vi } from 'vitest';
+import configureStore from 'redux-mock-store';
+import { rest } from 'msw';
+import { setupServer } from 'msw/node';
+import thunk from '@reduxjs/toolkit';
+import reducer, {
+  moveCard,
+  retrieveDataRepo,
+  setCurrentTitle,
+} from './repoDataSlice';
 import { IRootState } from '../../interfaces/repoData.interface';
+import { Endpoints } from '../../enums/Endpoints';
+
+const server = setupServer();
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 describe('RepoDataSlice', () => {
   it('should return the init state', () => {
@@ -89,5 +104,38 @@ describe('RepoDataSlice', () => {
         })
       )
     ).toEqual(doneState);
+  });
+});
+
+describe('Retrieve Data Repo', () => {
+  it('dispatches the correct actions when successful', async () => {
+    const dispatch = vi.fn();
+    const state: IRootState = {
+      currentRepoTitle: 'vitest-dev/vitest',
+      arrRepoData: [],
+    };
+    const response = {
+      fullName: 'vitest-dev/vitest',
+      stargazersCount: 8809,
+    };
+
+    server.use(
+      rest.get(
+        `${Endpoints.API_URL}${state.currentRepoTitle}`,
+        (req, res, ctx) => {
+          return res(ctx.json(response));
+        }
+      )
+    );
+    const thunk = retrieveDataRepo();
+    await thunk(dispatch, () => state, undefined);
+    const { calls } = dispatch.mock;
+
+    expect(calls).toHaveLength(2);
+
+    const [start, end] = calls;
+    expect(start[0].type).toBe('repo/retrieveDataRepo/pending');
+    expect(end[0].type).toBe('repo/retrieveDataRepo/fulfilled');
+    expect(end[0].payload).toEqual(response);
   });
 });
