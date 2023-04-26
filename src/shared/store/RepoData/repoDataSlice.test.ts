@@ -138,4 +138,33 @@ describe('Retrieve Data Repo', () => {
     expect(end[0].type).toBe('repo/retrieveDataRepo/fulfilled');
     expect(end[0].payload).toEqual(response);
   });
+  it('should retrieveDataRepo with rejected response', async () => {
+    const dispatch = vi.fn();
+    const state: IRootState = {
+      currentRepoTitle: 'vitest-dev/vitest',
+      arrRepoData: [],
+    };
+    const response = {
+      fullName: 'vitest-dev/vitest',
+      stargazersCount: 8809,
+    };
+
+    server.use(
+      rest.get(
+        `${Endpoints.API_URL}${state.currentRepoTitle}`,
+        (req, res, ctx) => {
+          return res(ctx.status(404), ctx.json(response));
+        }
+      )
+    );
+    const thunk = retrieveDataRepo();
+    await thunk(dispatch, () => state, undefined);
+    const { calls } = dispatch.mock;
+
+    expect(calls).toHaveLength(2);
+
+    const [start, end] = calls;
+    expect(start[0].type).toBe('repo/retrieveDataRepo/pending');
+    expect(end[0].type).toBe('repo/retrieveDataRepo/rejected');
+  });
 });
