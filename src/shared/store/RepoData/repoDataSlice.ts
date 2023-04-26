@@ -31,6 +31,7 @@ export const retrieveDataRepo = createAsyncThunk(
         >;
         return formattedData;
       }
+      throw new Error("Can't fetch");
     } catch (error) {
       console.log(error);
       throw error;
@@ -77,6 +78,7 @@ export const retrieveIssuesRepo = createAsyncThunk(
 
         return { doneState, progressState, todoState };
       }
+      throw new Error("Can't fetch");
     } catch (error) {
       console.log(error);
       throw error;
