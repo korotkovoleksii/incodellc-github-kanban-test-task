@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import configureStore from 'redux-mock-store';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import thunk from '@reduxjs/toolkit';
+
 import reducer, {
   moveCard,
   retrieveDataRepo,
   setCurrentTitle,
+  retrieveIssuesRepo,
 } from './repoDataSlice';
 import { IRootState } from '../../interfaces/repoData.interface';
 import { Endpoints } from '../../enums/Endpoints';
@@ -166,5 +166,98 @@ describe('Retrieve Data Repo', () => {
     const [start, end] = calls;
     expect(start[0].type).toBe('repo/retrieveDataRepo/pending');
     expect(end[0].type).toBe('repo/retrieveDataRepo/rejected');
+  });
+});
+
+describe('Retrieve Issues Repo', () => {
+  it('should Retrieve Issues Repo with fulfilled', async () => {
+    const dispatch = vi.fn();
+
+    const state: IRootState = {
+      currentRepoTitle: 'vitest-dev/vitest',
+      arrRepoData: [],
+    };
+    const response = {
+      assignee: null,
+      comments: 23,
+      number: 123412,
+      createdAt: 'test',
+      title: 'test',
+      state: 'close',
+      user: {
+        type: 'test',
+      },
+    };
+    const testPayload = {
+      doneState: [
+        {
+          assignee: false,
+          comments: 23,
+          number: 123412,
+          createdAt: 'test',
+          title: 'test',
+          state: 'close',
+          typeUser: 'test',
+        },
+      ],
+      progressState: [],
+      todoState: [],
+    };
+
+    server.use(
+      rest.get(
+        `${Endpoints.API_URL}${state.currentRepoTitle}/issues`,
+        (req, res, ctx) => {
+          return res(ctx.json([response]));
+        }
+      )
+    );
+    const thunk = retrieveIssuesRepo();
+    await thunk(dispatch, () => state, undefined);
+    const { calls } = dispatch.mock;
+
+    const [start, end] = calls;
+
+    expect(calls).toHaveLength(2);
+    expect(start[0].type).toBe('repo/retrieveIssuesRepo/pending');
+    expect(end[0].type).toBe('repo/retrieveIssuesRepo/fulfilled');
+    expect(end[0].payload).toEqual(testPayload);
+  });
+  it('should Retrieve Issues Repo with rejected', async () => {
+    const dispatch = vi.fn();
+
+    const state: IRootState = {
+      currentRepoTitle: 'vitest-dev/vitest',
+      arrRepoData: [],
+    };
+    const response = {
+      assignee: null,
+      comments: 23,
+      number: 123412,
+      createdAt: 'test',
+      title: 'test',
+      state: 'close',
+      user: {
+        type: 'test',
+      },
+    };
+
+    server.use(
+      rest.get(
+        `${Endpoints.API_URL}${state.currentRepoTitle}/issues`,
+        (req, res, ctx) => {
+          return res(ctx.status(404), ctx.json([response]));
+        }
+      )
+    );
+    const thunk = retrieveIssuesRepo();
+    await thunk(dispatch, () => state, undefined);
+    const { calls } = dispatch.mock;
+
+    const [start, end] = calls;
+
+    expect(calls).toHaveLength(2);
+    expect(start[0].type).toBe('repo/retrieveIssuesRepo/pending');
+    expect(end[0].type).toBe('repo/retrieveIssuesRepo/rejected');
   });
 });
